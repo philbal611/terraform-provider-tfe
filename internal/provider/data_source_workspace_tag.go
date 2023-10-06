@@ -42,7 +42,7 @@ func dataSourceTFEWorkspaceTagRead(ctx context.Context, d *schema.ResourceData, 
 	_, err := config.Client.Workspaces.ReadByID(ctx, workspaceID)
 	if err != nil {
 		return diag.Errorf(
-			"Error retrieving workspace %s: %w", workspaceID, err)
+			"Error retrieving workspace %s: %v", workspaceID, err)
 	}
 
 	// Create an options struct.
