@@ -1,9 +1,20 @@
-## Unreleased
+## v0.49.2 (October 4, 2023)
+
+BUG FIXES:
+* `d/tfe_outputs`: Fix incompatibility with the newly-released Terraform 1.6, which would result in a "Data Source Not Implemented" error.
+
+## v0.49.1 (October 2, 2023)
+
+BUG FIXES:
+* Reverts previous bug fix for provider making two service discovery requests per provider config. This was an internal refactor that broke provider token configuration, by @brandonc [1085](https://github.com/hashicorp/terraform-provider-tfe/pull/1085)
+
+## v0.49.0 (October 2, 2023)
 
 BUG FIXES:
 * `r/tfe_team_project_access`: Fixes a panic that occurs when the client is configured against an older TFE release, by @sebasslash [1011](https://github.com/hashicorp/terraform-provider-tfe/pull/1011)
 * The provider no longer makes two service discovery requests per provider config, by @brandonc [1034](https://github.com/hashicorp/terraform-provider-tfe/pull/1034)
 * `d/tfe_policy_set`: Add `excluded_workspace_ids` attribute, by @Netra2104 [1035](https://github.com/hashicorp/terraform-provider-tfe/pull/1035)
+* `r/tfe_workspace_policy_set` and `r/tfe_workspace_policy_set_exclusion`: Removed workspace-related `include` parameters since included workspace data is not required to manage these resources, by @jbonhag [1080](https://github.com/hashicorp/terraform-provider-tfe/pull/1080)
 
 FEATURES:
 * `d/tfe_organization_membership`: Add `organization_membership_id` attribute, by @laurenolivia [997](https://github.com/hashicorp/terraform-provider-tfe/pull/997)
