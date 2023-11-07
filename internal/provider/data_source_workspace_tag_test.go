@@ -21,28 +21,36 @@ func TestAccTFEWorkspaceTagDataSource_basic(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
+				Config: testAccTFEWorkspaceTagDataSourceConfig(rInt, tagName),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.tfe_workspace_tag.foobar", "tag_name", tagName),
-					resource.TestCheckResourceAttrSet("data.tfe_workspace_tag.foobar", "workspace_id"),
+					resource.TestCheckResourceAttrSet("data.tfe_workspace_tag.foobar", "id"),
 				),
 			},
 		},
 	})
 }
 
-func testAccTFEWorkspaceTagDataSourceConfig(orgName string, rInt int) string {
+func testAccTFEWorkspaceTagDataSourceConfig(rInt int, tagName string) string {
 	return fmt.Sprintf(`
 locals {
-    organization_name = "%s"
+	tag_name = "%s"
+}
+
+resource "tfe_organization" "foobar" {
+	name  = "org-%d"
+	email = "admin@company.com"
 }
 
 resource "tfe_workspace" "foobar" {
 	name         = "workspace-test-%d"
-	organization = local.organization_name
+	organization = tfe_organization.foobar.name
+
+	tag_names = [local.tag_name]
 }
 
 data "tfe_workspace_tag" "foobar" {
-	workspace_id      = resource.tfe_workspace.foobar.id
-	tag_name          = "tag-test-%d"
-}`, orgName, rInt, rInt)
+	workspace_id      = tfe_workspace.foobar.id
+	tag_name          = local.tag_name
+}`, tagName, rInt, rInt)
 }
