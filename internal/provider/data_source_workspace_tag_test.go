@@ -23,8 +23,10 @@ func TestAccTFEWorkspaceTagDataSource_basic(t *testing.T) {
 			{
 				Config: testAccTFEWorkspaceTagDataSourceConfig(rInt, tagName),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.tfe_workspace_tag.foobar", "tag_name", tagName),
-					resource.TestCheckResourceAttrSet("data.tfe_workspace_tag.foobar", "id"),
+					resource.TestCheckResourceAttr("data.tfe_workspace_tag.foo", "tag_name", tagName),
+					resource.TestCheckResourceAttr("data.tfe_workspace_tag.bar", "tag_name", tagName),
+					resource.TestCheckResourceAttrSet("data.tfe_workspace_tag.foo", "id"),
+					resource.TestCheckResourceAttrSet("data.tfe_workspace_tag.bar", "id"),
 				),
 			},
 		},
@@ -42,15 +44,31 @@ resource "tfe_organization" "foobar" {
 	email = "admin@company.com"
 }
 
-resource "tfe_workspace" "foobar" {
-	name         = "workspace-test-%d"
+resource "tfe_workspace" "foo" {
+	name         = "workspace-test-foo-%d"
 	organization = tfe_organization.foobar.name
 
 	tag_names = [local.tag_name]
 }
 
-data "tfe_workspace_tag" "foobar" {
-	workspace_id      = tfe_workspace.foobar.id
+resource "tfe_workspace" "bar" {
+	name         = "workspace-test-bar-%d"
+	organization = tfe_organization.foobar.name
+}
+
+resource "tfe_workspace_tag" "bar" {
+	workspace_id      = tfe_workspace.bar.id
 	tag_name          = local.tag_name
-}`, tagName, rInt, rInt)
+}
+
+data "tfe_workspace_tag" "foo" {
+	workspace_id = tfe_workspace.foo.id
+	tag_name     = local.tag_name
+}
+
+data "tfe_workspace_tag" "bar" {
+	workspace_id = tfe_workspace.bar.id
+	tag_name     = local.tag_name
+	depends_on   = [tfe_workspace_tag.bar]
+}`, tagName, rInt, rInt, rInt)
 }
