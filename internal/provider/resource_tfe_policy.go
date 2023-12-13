@@ -26,6 +26,8 @@ func resourceTFEPolicy() *schema.Resource {
 			StateContext: resourceTFEPolicyImporter,
 		},
 
+		CustomizeDiff: customizeDiffIfProviderDefaultOrganizationChanged,
+
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Description: "The name of the policy",
@@ -264,7 +266,7 @@ func resourceTFEPolicyUpdate(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(ConfiguredClient)
 
 	// nolint:nestif
-	if d.HasChange("description") || d.HasChange("enforce_mode") {
+	if d.HasChange("description") || d.HasChange("enforce_mode") || d.HasChange("query") {
 		// Create a new options struct.
 		options := tfe.PolicyUpdateOptions{}
 
@@ -286,6 +288,10 @@ func resourceTFEPolicyUpdate(d *schema.ResourceData, meta interface{}) error {
 					Mode: tfe.EnforcementMode(tfe.EnforcementLevel(d.Get("enforce_mode").(string))),
 				},
 			}
+		}
+
+		if query, ok := d.GetOk("query"); ok {
+			options.Query = tfe.String(query.(string))
 		}
 
 		log.Printf("[DEBUG] Update configuration for %s policy: %s", vKind, d.Id())

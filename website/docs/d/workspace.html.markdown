@@ -34,6 +34,7 @@ In addition to all arguments above, the following attributes are exported:
 * `id` - The workspace ID.
 * `allow_destroy_plan` - Indicates whether destroy plans can be queued on the workspace.
 * `auto_apply` - Indicates whether to automatically apply changes when a Terraform plan is successful.
+* `auto_apply_run_trigger` - Whether the workspace will automatically apply changes for runs that were created by run triggers from another workspace.
 * `assessments_enabled` - (Available only in Terraform Cloud) Indicates whether health assessments such as drift detection are enabled for the workspace.
 * `file_triggers_enabled` - Indicates whether runs are triggered based on the changed files in a VCS push (if `true`) or always triggered on every push (if `false`).
 * `global_remote_state` - (Optional) Whether the workspace should allow all workspaces in the organization to access its state data during runs. If false, then only specifically approved workspaces can access its state (determined by the `remote_state_consumer_ids` argument).
@@ -59,7 +60,7 @@ In addition to all arguments above, the following attributes are exported:
 * `trigger_patterns` - List of [glob patterns](https://developer.hashicorp.com/terraform/cloud-docs/workspaces/settings/vcs#glob-patterns-for-automatic-run-triggering) that describe the files Terraform Cloud monitors for changes. Trigger patterns are always appended to the root directory of the repository.
 * `vcs_repo` - Settings for the workspace's VCS repository.
 * `working_directory` - A relative path that Terraform will execute within.
-* `execution_mode` - Indicates the [execution mode](https://developer.hashicorp.com/terraform/cloud-docs/workspaces/settings#execution-mode) of the workspace. Possible values include `remote`, `local`, or `agent`.
+* `execution_mode` - **Deprecated** Indicates the [execution mode](https://developer.hashicorp.com/terraform/cloud-docs/workspaces/settings#execution-mode) of the workspace. Use the `tfe_workspace_settings` resource instead.
 * `html_url` - The URL to the browsable HTML overview of the workspace
 
 

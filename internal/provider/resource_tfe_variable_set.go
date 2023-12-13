@@ -24,6 +24,8 @@ func resourceTFEVariableSet() *schema.Resource {
 			StateContext: schema.ImportStatePassthroughContext,
 		},
 
+		CustomizeDiff: customizeDiffIfProviderDefaultOrganizationChanged,
+
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -40,6 +42,12 @@ func resourceTFEVariableSet() *schema.Resource {
 				Optional:      true,
 				Default:       false,
 				ConflictsWith: []string{"workspace_ids"},
+			},
+
+			"priority": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
 			},
 
 			"organization": {
@@ -71,8 +79,9 @@ func resourceTFEVariableSetCreate(d *schema.ResourceData, meta interface{}) erro
 
 	// Create a new options struct.
 	options := tfe.VariableSetCreateOptions{
-		Name:   tfe.String(name),
-		Global: tfe.Bool(d.Get("global").(bool)),
+		Name:     tfe.String(name),
+		Global:   tfe.Bool(d.Get("global").(bool)),
+		Priority: tfe.Bool(d.Get("priority").(bool)),
 	}
 
 	if description, descriptionSet := d.GetOk("description"); descriptionSet {
@@ -128,6 +137,7 @@ func resourceTFEVariableSetRead(d *schema.ResourceData, meta interface{}) error 
 	d.Set("name", variableSet.Name)
 	d.Set("description", variableSet.Description)
 	d.Set("global", variableSet.Global)
+	d.Set("priority", variableSet.Priority)
 	d.Set("organization", variableSet.Organization.Name)
 
 	var wids []interface{}
@@ -142,11 +152,12 @@ func resourceTFEVariableSetRead(d *schema.ResourceData, meta interface{}) error 
 func resourceTFEVariableSetUpdate(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(ConfiguredClient)
 
-	if d.HasChange("name") || d.HasChange("description") || d.HasChange("global") {
+	if d.HasChange("name") || d.HasChange("description") || d.HasChange("global") || d.HasChange("priority") {
 		options := tfe.VariableSetUpdateOptions{
 			Name:        tfe.String(d.Get("name").(string)),
 			Description: tfe.String(d.Get("description").(string)),
 			Global:      tfe.Bool(d.Get("global").(bool)),
+			Priority:    tfe.Bool(d.Get("priority").(bool)),
 		}
 
 		log.Printf("[DEBUG] Update variable set: %s", d.Id())

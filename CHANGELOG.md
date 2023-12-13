@@ -1,3 +1,41 @@
+# UNRELEASED
+<!-- Add CHANGELOG entry to this section for any PR awaiting the next release -->
+<!-- Please also include if this is a Bug Fix, Enhancement, or Feature -->
+
+DEPRECATIONS and BREAKING CHANGES:
+* `r/tfe_workspace`: `execution_mode` and `agent_pool_id` attributes have been deprecated in favor of a new resource, `tfe_workspace_settings`. Note that these fields no longer compute defaults which is consistent with using a new resource to manage these same settings. What this means in practice is that if you unset `execution_mode` or `agent_pool_id` without also creating a `tfe_workspace_settings`, the setting will no longer revert to the default "remote" mode. To migrate, relocate the `execution_mode` and `agent_pool_id` arguments to `tfe_workspace_settings`.
+
+BUG FIXES:
+* `r/tfe_policy`: Fix the provider ignoring updates to the `query` field, by @skeggse [1108](https://github.com/hashicorp/terraform-provider-tfe/pull/1108)
+* Fix the undetected change when modifying the `organization` default in the provider configuration by @brandonc [1152](https://github.com/hashicorp/terraform-provider-tfe/issue/1152)
+* New resource `r/tfe_workspace_settings`: Can be used to break any circular dependency between `tfe_workspace` and `tfe_agent_pool_allowed_workspaces` by managing the `agent_pool_id` for a Workspace by @brandonc [1159](https://github.com/hashicorp/terraform-provider-tfe/pull/1159)
+
+FEATURES:
+* `d/tfe_registry_module`: Add `vcs_repo.tags` and `vcs_repo.branch` attributes to allow configuration of `publishing_mechanism`. Add `test_config` to support running tests on `branch`-based registry modules, by @hashimoon [1096](https://github.com/hashicorp/terraform-provider-tfe/pull/1096)
+* **New Resource**: `r/tfe_organization_default_settings` is a new resource to set the `default_execution_mode` and `default_agent_pool_id` for an organization, by @SwiftEngineer [1137](https://github.com/hashicorp/terraform-provider-tfe/pull/1137)'
+* **New Resource**: `r/tfe_workspace_settings` Uses the `tfe_organization_default_settings` `default_execution_mode` and `default_agent_pool_id` as the default `execution_mode` by @brandonc and @laurenolivia [1159](https://github.com/hashicorp/terraform-provider-tfe/pull/1159)
+* **New Resource**: `r/tfe_registry_gpg_key` is a new resource for managing private registry GPG keys, by @tmatilai [1160](https://github.com/hashicorp/terraform-provider-tfe/pull/1160)
+* **New Data Source**: `d/tfe_registry_gpg_key` is a new data source to retrieve a private registry GPG key, by @tmatilai [1160](https://github.com/hashicorp/terraform-provider-tfe/pull/1160)
+* **New Data Source**: `d/tfe_registry_gpg_keys` is a new data source to retrieve all private registry GPG keys of an organization, by @tmatilai [1160](https://github.com/hashicorp/terraform-provider-tfe/pull/1160)
+
+ENHANCEMENTS:
+* `d/tfe_organization`: Make `name` argument optional if configured for the provider, by @tmatilai [1133](https://github.com/hashicorp/terraform-provider-tfe/pull/1133)
+
+## v0.50.0
+
+FEATURES:
+* `r/tfe_workspace`: Add `auto_apply_run_trigger` attribute, by @nfagerlund [1123](https://github.com/hashicorp/terraform-provider-tfe/pull/1123)
+* `d/tfe_workspace`: Add `auto_apply_run_trigger` attribute, by @nfagerlund [1123](https://github.com/hashicorp/terraform-provider-tfe/pull/1123)
+* `r/tfe_variable_set`: Add `priority` attribute, by @Netra2104 [1075](https://github.com/hashicorp/terraform-provider-tfe/pull/1075)
+* `d/tfe_variable_set`: Add `priority` attribute, by @Netra2104 [1075](https://github.com/hashicorp/terraform-provider-tfe/pull/1075)
+
+BUG FIXES:
+
+* `r/tfe_policy_set`: Fix detecting spurious changes on every run when providing file contents with `tfe_slug`. This may require an updated version of tfc-agent for the full fix to take effect. Fixed by upgrading go-slug to v0.13.1 [1123](https://github.com/hashicorp/terraform-provider-tfe/pull/1123)
+* `r/tfe_variable`: Fix nil pointer dereference segfault on client error during Update operations, by @nfagerlund [1131](https://github.com/hashicorp/terraform-provider-tfe/1131)
+* provider: Fix an issue where the request body is not preserved during certain retry scenarios, by @sebasslash [1135](https://github.com/hashicorp/terraform-provider-tfe/pull/1135)
+* provider: Fix a build failure for 32 bit linux architectures by @brandonc [1139](https://github.com/hashicorp/terraform-provider-tfe/pull/1139)
+
 ## v0.49.2 (October 4, 2023)
 
 BUG FIXES:

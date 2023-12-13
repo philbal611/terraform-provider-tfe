@@ -13,6 +13,8 @@ import (
 
 	tfe "github.com/hashicorp/go-tfe"
 	"github.com/hashicorp/go-uuid"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
 const RunTasksURLEnvName = "RUN_TASKS_URL"
@@ -143,6 +145,28 @@ func createOrganization(t *testing.T, client *tfe.Client, options tfe.Organizati
 	}
 }
 
+func createTempWorkspace(t *testing.T, client *tfe.Client, orgName string) *tfe.Workspace {
+	t.Helper()
+
+	ctx := context.Background()
+	ws, err := client.Workspaces.Create(ctx, orgName, tfe.WorkspaceCreateOptions{
+		Name: tfe.String(fmt.Sprintf("tst-workspace-%s", randomString(t))),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Cleanup(func() {
+		if err := client.Workspaces.DeleteByID(ctx, ws.ID); err != nil {
+			t.Errorf("Error destroying workspace! WARNING: Dangling resources\n"+
+				"may exist! The full error is show below:\n\n"+
+				"Workspace:%s\nError: %s", ws.ID, err)
+		}
+	})
+
+	return ws
+}
+
 func createOrganizationMembership(t *testing.T, client *tfe.Client, orgName string, options tfe.OrganizationMembershipCreateOptions) *tfe.OrganizationMembership {
 	ctx := context.Background()
 	orgMembership, err := client.OrganizationMemberships.Create(ctx, orgName, options)
@@ -266,6 +290,20 @@ func skipIfUnitTest(t *testing.T) {
 	if !isAcceptanceTest() {
 		t.Skip("Skipping test because this test is an acceptance test, and is run as a unit test. Set 'TF_ACC=1' to run.")
 	}
+}
+
+// A wrapper for resource.TestCheckResourceAttr that skips the check if running tests against
+// Terraform Enterprise. Useful for testing new attributes that haven't been added to TFE
+// yet, without having to skip an entire test.
+//
+//nolint:unparam
+func testCheckResourceAttrUnlessEnterprise(name, key, value string) resource.TestCheckFunc {
+	if enterpriseEnabled() {
+		return func(s *terraform.State) error {
+			return nil
+		}
+	}
+	return resource.TestCheckResourceAttr(name, key, value)
 }
 
 func randomString(t *testing.T) string {

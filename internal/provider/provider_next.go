@@ -5,13 +5,16 @@ package provider
 
 import (
 	"context"
+	"fmt"
 	"os"
+	"regexp"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-provider-tfe/internal/client"
 )
 
 // frameworkProvider is a type that implements the terraform-plugin-framework
@@ -21,6 +24,14 @@ type frameworkProvider struct{}
 
 // Compile-time interface check
 var _ provider.Provider = &frameworkProvider{}
+
+// Can be used to construct ID regexp patterns
+var base58Alphabet = "[1-9A-HJ-NP-Za-km-z]"
+
+// IDPattern constructs a regexp pattern for Terraform Cloud with the given prefix
+func IDPattern(prefix string) *regexp.Regexp {
+	return regexp.MustCompile(fmt.Sprintf("^%s-%s{16}$", prefix, base58Alphabet))
+}
 
 // FrameworkProviderConfig is a helper type for extracting the provider
 // configuration from the provider block.
@@ -94,7 +105,7 @@ func (p *frameworkProvider) Configure(ctx context.Context, req provider.Configur
 		data.Organization = types.StringValue(os.Getenv("TFE_ORGANIZATION"))
 	}
 
-	client, err := getClient(data.Hostname.ValueString(), data.Token.ValueString(), data.SSLSkipVerify.ValueBool())
+	tfeClient, err := client.GetClient(data.Hostname.ValueString(), data.Token.ValueString(), data.SSLSkipVerify.ValueBool())
 
 	if err != nil {
 		res.Diagnostics.AddError("Failed to initialize HTTP client", err.Error())
@@ -102,7 +113,7 @@ func (p *frameworkProvider) Configure(ctx context.Context, req provider.Configur
 	}
 
 	configuredClient := ConfiguredClient{
-		Client:       client,
+		Client:       tfeClient,
 		Organization: data.Organization.ValueString(),
 	}
 
@@ -112,13 +123,17 @@ func (p *frameworkProvider) Configure(ctx context.Context, req provider.Configur
 
 func (p *frameworkProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
+		NewRegistryGPGKeyDataSource,
+		NewRegistryGPGKeysDataSource,
 		NewSAMLSettingsDataSource,
 	}
 }
 
 func (p *frameworkProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
+		NewRegistryGPGKeyResource,
 		NewResourceVariable,
 		NewSAMLSettingsResource,
+		NewResourceWorkspaceSettings,
 	}
 }
