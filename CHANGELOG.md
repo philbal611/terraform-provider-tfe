@@ -1,3 +1,43 @@
+## UNRELEASED
+### Enhancements
+* Adds `post_apply` to list of possible `stages` for Run Tasks by @carolinaborim [#1307](https://github.com/hashicorp/terraform-provider-tfe/pull/1307)
+
+### Features
+* **New Resource**: `r/tfe_project_oauth_client` attaches/detaches an existing `project` to an existing `oauth client`, by @Netra2104 [1144](https://github.com/hashicorp/terraform-provider-tfe/pull/1144)
+  
+## v0.53.0
+
+FEATURES:
+* `r/tfe_workspace`: Add `ignore_additional_tag_names` which explicitly ignores `tag_names` _not_ defined by config so they will not be overwritten by the configured tags, by @brandonc and @mbillow [1254](https://github.com/hashicorp/terraform-provider-tfe/pull/1254)
+* `r/tfe_oauth_client`: Add `organization_scoped` attribute, by @Netra2104 [1142](https://github.com/hashicorp/terraform-provider-tfe/pull/1142)
+
+BUG FIXES:
+
+* `r/tfe_registry_module`: Fix registry module always triggering re-creation when an organization is not present, by @hashimoon [1263](https://github.com/hashicorp/terraform-provider-tfe/pull/1263)
+* `r/tfe_workspace`: Change the error message returned when a workspace cannot be safe-deleted to reflect that the error can happen when the latest state is still being processed @uturunku1 [1274](https://github.com/hashicorp/terraform-provider-tfe/pull/1274)
+
+
+ENHANCEMENTS:
+* `r/tfe_registry_module`: Update `Delete` method to call `DeleteByName` when `module_provider` is not present, and `DeleteProvider` when `module_provider` exists @laurenolivia[1267](https://github.com/hashicorp/terraform-provider-tfe/pull/1267)
+
+## v0.52.0
+
+FEATURES:
+* **New Resource**: `r/tfe_registry_provider` is a new resource for managing public and private providers in the private registry, by @tmatilai [1185](https://github.com/hashicorp/terraform-provider-tfe/pull/1185)
+* **New Data Source**: `d/tfe_registry_provider` is a new data source to retrieve information about a public or private provider in the private registry, by @tmatilai [1185](https://github.com/hashicorp/terraform-provider-tfe/pull/1185)
+* **New Data Source**: `d/tfe_registry_providers` is a new data source to retrieve information about public and private providers in the private registry, by @tmatilai [1185](https://github.com/hashicorp/terraform-provider-tfe/pull/1185)
+* **New Data Source**: `d/tfe_no_code_module` is a new data source to retrieve information about a no-code module, by @catsby [1242](https://github.com/hashicorp/terraform-provider-tfe/pull/1242)
+* **New Resource**: `r/tfe_sentinel_version` adds the ability for Terraform Enterprise admins to configure settings for sentinel versions ([#1202](https://github.com/hashicorp/terraform-provider-tfe/pull/1202))
+* **New Resource**: `r/tfe_opa_version` adds the ability for Terraform Enterprise admins to configure settings for OPA versions ([#1202](https://github.com/hashicorp/terraform-provider-tfe/pull/1202))
+* `r/tfe_policy_set`: Add `agent_enabled` and `policy_tool_version` attributes to allow setting a policy runtime version to the policy set, by @mrinalirao [1234](https://github.com/hashicorp/terraform-provider-tfe/pull/1234)
+* `d/tfe_policy_set`: Add `agent_enabled` and `policy_tool_version` attributes to get the policy runtime version of a policy set, by @mrinalirao [1234](https://github.com/hashicorp/terraform-provider-tfe/pull/1234)
+* `r/tfe_organization`: Add `aggregated_commit_status_enabled` attribute, by @mjyocca [1169](https://github.com/hashicorp/terraform-provider-tfe/pull/1169)
+* `d/tfe_organization`: Add `aggregated_commit_status_enabled` attribute, by @mjyocca [1169](https://github.com/hashicorp/terraform-provider-tfe/pull/1169)
+
+BUG FIXES:
+
+* `r/tfe_workspace`: Fix panic on creation when `trigger_prefixes = [""]`, by @nfagerlund [1214](https://github.com/hashicorp/terraform-provider-tfe/pull/1214)
+
 ## v0.51.1
 
 BUG FIXES:
